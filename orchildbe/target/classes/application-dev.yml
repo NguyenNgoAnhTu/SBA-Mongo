@@ -1,0 +1,27 @@
+jwt:
+  secret: nguyenngochieunguyenngochieunguyenngochieu
+  expiration: 31536000000
+
+spring:
+  application:
+    name: orchidbe
+
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: orchid_db
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    configUrl: /v3/api-docs/swagger-config
+    urls:
+      - url: /v3/api-docs
+        name: orchidbe
+    use-root-path: true
+    operations-sorter: alpha
+    tags-sorter: alpha
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
