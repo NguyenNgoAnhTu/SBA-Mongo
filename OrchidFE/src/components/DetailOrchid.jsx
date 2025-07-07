@@ -1,95 +1,272 @@
-import React from "react";
-import { useParams } from "react-router";
+import React, { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
 import axios from "axios";
+import toast, { Toaster } from 'react-hot-toast';
+import { useCart } from '../context/CartContext';
+import apiService from '../api/apiService';
 
-export default function DetailOrchid() {
-  const [orchid, setOrchid] = React.useState({});
-  const params = useParams();
-  const id = params.id;
-  const baseUrl = import.meta.env.VITE_API_URL;
+// Component cho icon
+const PlusIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" /></svg>;
+const MinusIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clipRule="evenodd" /></svg>;
+const ArrowLeftIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" /></svg>;
+const ShoppingCartIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" /></svg>;
+const NaturalIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" /></svg>;
 
-  React.useEffect(() => {
-    fetchData();
-  }, [id]);
-
-  const fetchData = () => {
-    axios
-      .get(`${baseUrl}/${id}`)
-      .then((response) => {
-        setOrchid(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  };
-
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-start bg-gray-100 pt-8">
-      <div className="w-full max-w-4xl">
-        <div className="max-w-5xl mx-auto py-8 px-4">
-          <div className="flex flex-col md:flex-row gap-16">
-            <div className="flex-1">
-              <nav className="text-sm mb-4" aria-label="Breadcrumb">
-                <ol className="list-reset flex text-gray-500">
-                  <li>
-                    <a href="#home" className="hover:text-indigo-600">
-                      Home
-                    </a>
-                  </li>
-                  <li>
-                    <span className="mx-2">/</span>
-                  </li>
-                  <li className="text-gray-700 font-semibold">
-                    {orchid.orchidName || "Loading..."}
-                  </li>
-                </ol>
-              </nav>
-              <span className="inline-block bg-indigo-100 text-indigo-800 px-3 py-1 rounded mb-3 font-semibold">
-                {orchid.orchidName || "Loading..."}
-              </span>
-              <div className="bg-white rounded-xl shadow-lg mt-3">
-                <div className="border-b px-6 py-4">
-                  <p className="text-indigo-700 font-semibold text-lg">
-                    {orchid.description || "Loading..."}
-                  </p>
-                </div>
-                <hr />
-                <div className="px-6 py-4">
-                  {orchid.isNatural ? (
-                    <span className="inline-block bg-green-100 text-green-800 px-3 py-1 rounded font-semibold">
-                      This Orchid is a natural product
-                    </span>
-                  ) : (
-                    <span className="inline-block bg-yellow-100 text-yellow-800 px-3 py-1 rounded font-semibold">
-                      This Orchid is an industrial product
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className=" flex flex-col items-center mt-25">
-              <span className="inline-block bg-gray-200 p-2 rounded-full mb-4">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="30"
-                  height="30"
-                  viewBox="0 0 48 48"
-                  fill="currentColor"
-                >
-                  <path d="M26.924 4c.967 0 1.866.217 2.667.675c.685.39 1.462.93 2.037 1.734l-.012.01l.01.014l2.332 3.022l.822 1.095a9.414 9.414 0 0 1-.002 11.34l-4.508 5.818l6.95 8.944a2 2 0 0 1-.242 2.713l-4.066 3.662A2 2 0 0 1 30 42.775l-5.79-7.383l-5.845 7.451a2 2 0 0 1-2.781.36l-4.379-3.317a2 2 0 0 1-.368-2.826l7.314-9.358l-4.504-5.714l-.006-.008a9.414 9.414 0 0 1-.002-11.339l.002-.002l.811-1.082l2.337-3.029l.108-.141C18.008 4.85 19.853 4 21.678 4zm1.675 2.411c.551.315 1.02.66 1.348 1.088l-.015.011l.1.13a4.03 4.03 0 0 1-.022 4.792c-.934-.57-2.045-.923-3.177-.923h-5.247c-1.123 0-2.267.3-3.241.924a4.2 4.2 0 0 1-.735-2.366c0-.815.256-1.632.773-2.331l.115-.15l.01-.014C19.21 6.59 20.434 6 21.677 6h5.248c.66 0 1.21.145 1.675.411m-9.025 7.616l4.6 5.942l4.6-5.942c-.598-.325-1.278-.518-1.94-.518h-5.248c-.72 0-1.42.179-2.012.518m9.422 12.06l-3.552-4.49l6.066-7.836a5.95 5.95 0 0 0 1.199-2.638l.475.633a7.415 7.415 0 0 1 .003 8.921zm-9.57 3.232l-7.013 8.973l4.378 3.317l6.146-7.836zM16.91 13.852a6.06 6.06 0 0 1-1.192-2. nghĩ-648l-.479.639l-.003.004a7.414 7.414 0 0 0-.005 8.918l9.766 12.39l6.578 8.386l4.066-3.662l-7.42-9.55l-4.795-6.06z" />
-                </svg>
-              </span>
-              {orchid.image && (
-                <img
-                  src={orchid.image}
-                  alt={orchid.orchidName || "Loading..."}
-                  className="my-3 w-[400px] h-[400px] object-cover rounded shadow-lg"
-                />
-              )}
-            </div>
-          </div>
-        </div>
+const LoadingSpinner = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-pink-50">
+    <div className="relative">
+      <div className="w-20 h-20 border-4 border-indigo-200 border-solid rounded-full animate-spin"></div>
+      <div className="absolute top-0 left-0 w-20 h-20 border-4 border-indigo-600 border-solid rounded-full border-t-transparent animate-spin"></div>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-2xl">🌸</span>
       </div>
     </div>
-  );
+  </div>
+);
+
+export default function DetailOrchid() {
+    const [orchid, setOrchid] = useState(null);
+    const [quantity, setQuantity] = useState(1);
+    const { id } = useParams();
+    const { addToCart } = useCart();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await apiService.get(`/api/v1/orchids/${id}`);
+                
+                const apiData = response.data;
+                const formattedOrchid = {
+                    ...apiData,
+                    imageUrl: apiData.orchidUrl,
+                    description: apiData.orchidDecription,
+                    isNatural: apiData.natural,
+                };
+                setOrchid(formattedOrchid);
+
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                if (error.response?.status !== 401 && error.response?.status !== 403) {
+                    toast.error("Could not fetch orchid details.");
+                }
+            }
+        };
+
+        if (id) {
+            fetchData();
+        }
+    }, [id]);
+
+    const handleQuantityChange = (amount) => {
+        setQuantity(prev => Math.max(1, prev + amount));
+    };
+    
+    const handleAddToCart = () => {
+        if (orchid) {
+            addToCart(orchid, quantity);
+        }
+    };
+
+    const formatPrice = (price) => {
+        if (!price) return 'N/A';
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+    };
+    
+    if (!orchid) {
+        return <LoadingSpinner />;
+    }
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+            <Toaster 
+                position="top-center" 
+                toastOptions={{
+                    duration: 3000,
+                    style: {
+                        background: '#363636',
+                        color: '#fff',
+                        borderRadius: '12px',
+                        padding: '16px',
+                    },
+                }}
+            />
+            
+            {/* Back Button */}
+            <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-200">
+                <div className="max-w-7xl mx-auto px-4 py-4">
+                    <Link 
+                        to="/home" 
+                        className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-full shadow-sm hover:bg-gray-50 hover:shadow-md transition-all duration-200 border border-gray-200"
+                    >
+                        <ArrowLeftIcon />
+                        <span className="ml-2">Back to Gallery</span>
+                    </Link>
+                </div>
+            </div>
+
+            <div className="max-w-7xl mx-auto px-4 py-8">
+                <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+                        {/* Image Section */}
+                        <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 p-8 lg:p-12">
+                            <div className="aspect-square relative overflow-hidden rounded-2xl shadow-2xl">
+                                <img
+                                    src={orchid.imageUrl}
+                                    alt={orchid.name}
+                                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
+                            </div>
+                            
+                            {/* Floating Badge */}
+                            <div className="absolute top-12 right-12">
+                                {orchid.isNatural ? (
+                                    <div className="bg-green-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg flex items-center">
+                                        <NaturalIcon />
+                                        Natural
+                                    </div>
+                                ) : (
+                                    <div className="bg-amber-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg flex items-center">
+                                        <NaturalIcon />
+                                        Artificial
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Content Section */}
+                        <div className="p-8 lg:p-12 flex flex-col justify-center">
+                            {/* Breadcrumb */}
+                            <nav className="text-sm mb-6 pb-4 border-b border-gray-100">
+                                <ol className="flex items-center space-x-2 text-gray-500">
+                                    <li><Link to="/home" className="hover:text-indigo-600 font-medium transition-colors">Home</Link></li>
+                                    <li><span className="mx-2 text-gray-300">/</span></li>
+                                    <li><span className="text-gray-400">Orchid Details</span></li>
+                                    <li><span className="mx-2 text-gray-300">/</span></li>
+                                    <li className="text-gray-800 font-semibold truncate max-w-32">{orchid.name}</li>
+                                </ol>
+                            </nav>
+                            
+                            {/* Title */}
+                            <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+                                {orchid.name}
+                            </h1>
+                            
+                            {/* Category Badge */}
+                            {orchid.categoryName && (
+                                <div className="mb-6">
+                                    <span className="inline-flex items-center px-4 py-2 bg-indigo-100 text-indigo-800 text-sm font-semibold rounded-full">
+                                        Category: {orchid.categoryName}
+                                    </span>
+                                </div>
+                            )}
+
+                            {/* Description */}
+                            <div className="mb-8">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-3">Description</h3>
+                                <p className="text-gray-600 text-lg leading-relaxed">
+                                    {orchid.description || "This beautiful orchid will make a perfect addition to your collection."}
+                                </p>
+                            </div>
+
+                            {/* Price */}
+                            <div className="mb-8">
+                                <div className="flex items-baseline space-x-2">
+                                    <span className="text-4xl lg:text-5xl font-bold text-indigo-600">
+                                        {formatPrice(orchid.price)}
+                                    </span>
+                                    <span className="text-lg text-gray-500 line-through">
+                                        {orchid.originalPrice && formatPrice(orchid.originalPrice)}
+                                    </span>
+                                </div>
+                                <p className="text-sm text-gray-500 mt-1">Includes care guide and pot</p>
+                            </div>
+                            
+                            {/* Quantity and Add to Cart */}
+                            <div className="space-y-6">
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                                        Quantity
+                                    </label>
+                                    <div className="flex items-center">
+                                        <div className="flex items-center border-2 border-gray-200 rounded-2xl bg-white shadow-sm">
+                                            <button 
+                                                onClick={() => handleQuantityChange(-1)} 
+                                                className="p-4 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-l-2xl transition-all duration-200"
+                                                disabled={quantity <= 1}
+                                            >
+                                                <MinusIcon />
+                                            </button>
+                                            <input 
+                                                type="text" 
+                                                readOnly 
+                                                value={quantity}
+                                                className="w-20 text-center font-bold text-xl py-4 border-0 bg-transparent"
+                                            />
+                                            <button 
+                                                onClick={() => handleQuantityChange(1)} 
+                                                className="p-4 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-r-2xl transition-all duration-200"
+                                            >
+                                                <PlusIcon />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button
+                                    onClick={handleAddToCart}
+                                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-4 px-8 rounded-2xl shadow-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 flex items-center justify-center text-lg"
+                                >
+                                    <ShoppingCartIcon />
+                                    Add to Cart
+                                </button>
+
+                                <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+                                    <div className="text-center">
+                                        <div className="text-2xl mb-1">🚚</div>
+                                        <div className="text-xs font-semibold text-gray-600">Free Delivery</div>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className="text-2xl mb-1">🛡️</div>
+                                        <div className="text-xs font-semibold text-gray-600">Quality Guarantee</div>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className="text-2xl mb-1">📞</div>
+                                        <div className="text-xs font-semibold text-gray-600">24/7 Support</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Additional Information Section */}
+                <div className="mt-12 bg-white rounded-3xl shadow-lg p-8 border border-gray-100">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Care Instructions</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="text-center p-4 bg-blue-50 rounded-2xl">
+                            <div className="text-3xl mb-2">💧</div>
+                            <h3 className="font-semibold text-gray-800 mb-1">Watering</h3>
+                            <p className="text-sm text-gray-600">Water weekly or when soil feels dry</p>
+                        </div>
+                        <div className="text-center p-4 bg-yellow-50 rounded-2xl">
+                            <div className="text-3xl mb-2">☀️</div>
+                            <h3 className="font-semibold text-gray-800 mb-1">Light</h3>
+                            <p className="text-sm text-gray-600">Bright, indirect sunlight</p>
+                        </div>
+                        <div className="text-center p-4 bg-green-50 rounded-2xl">
+                            <div className="text-3xl mb-2">🌡️</div>
+                            <h3 className="font-semibold text-gray-800 mb-1">Temperature</h3>
+                            <p className="text-sm text-gray-600">18-24°C ideal range</p>
+                        </div>
+                        <div className="text-center p-4 bg-purple-50 rounded-2xl">
+                            <div className="text-3xl mb-2">💨</div>
+                            <h3 className="font-semibold text-gray-800 mb-1">Humidity</h3>
+                            <p className="text-sm text-gray-600">50-70% humidity preferred</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 }

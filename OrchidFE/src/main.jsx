@@ -1,14 +1,18 @@
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App.jsx';
 import './index.css';
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { BrowserRouter} from 'react-router'
-import App from './App.jsx'
+import { BrowserRouter } from 'react-router-dom'; // Sửa: Dùng 'react-router-dom'
+import { CartProvider } from './context/CartContext.jsx';
+import { Toaster } from 'react-hot-toast'; // Import Toaster ở đây
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
     <BrowserRouter>
-    <App />
+      <CartProvider>
+        <Toaster position="top-center" reverseOrder={false} /> {/* Đặt Toaster ở đây để dùng chung */}
+        <App />
+      </CartProvider>
     </BrowserRouter>
-   
-  </StrictMode>,
-)
+  </React.StrictMode>
+);

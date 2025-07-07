@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import { Controller, useForm } from "react-hook-form";
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router-dom';
 
 export default function EditOrchid() {
   const baseUrl = import.meta.env.VITE_API_URL;
